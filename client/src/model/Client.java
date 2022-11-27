@@ -84,9 +84,11 @@ public class Client {
 	//tomado de: https://heptadecane.medium.com/file-transfer-via-java-sockets-e8d4f30703a5
 	private static void sendFile(String path,String fileName,long key) throws Exception{
         int bytes = 0;
+		String momentaneumFile = "momentaneum"+fileName;
+
         File file = new File(path);
         FileInputStream fileInputStream = new FileInputStream(file);
-		FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+		FileOutputStream fileOutputStream = new FileOutputStream(momentaneumFile);
 
 		byte[] fileData = new byte[(int)file.length()];
         fileInputStream.read(fileData);
@@ -101,7 +103,13 @@ public class Client {
 		byte[] encryptedFile = cipher.doFinal(fileData);
 		fileOutputStream.write(encryptedFile);
         // send file size
+
+		file = new File(momentaneumFile);
+		dataOutputStream.writeUTF(fileName);
         dataOutputStream.writeLong(file.length()); 
+
+
+		fileInputStream = new FileInputStream(file);
         // break file into chunks
         byte[] buffer = new byte[4*1024];
 		long size = 4*1024;
@@ -114,13 +122,16 @@ public class Client {
 		// }
 
 		// sends fileName
-		dataOutputStream.writeUTF(fileName);
+		
 
         while ((bytes=fileInputStream.read(buffer))!=-1){
             System.out.println("bytes " + bytes);
 			dataOutputStream.write(buffer,0,bytes);
             dataOutputStream.flush();
         }
+
+		file = new File(momentaneumFile);
+		file.deleteOnExit();
 
         fileInputStream.close();
 		fileOutputStream.close();

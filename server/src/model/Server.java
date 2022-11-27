@@ -77,10 +77,11 @@ public class Server {
 	//tomado de: https://heptadecane.medium.com/file-transfer-via-java-sockets-e8d4f30703a5
 	private static void receiveFile(long key) throws Exception{
         int bytes = 0;
-
+		System.out.println("entra al método");
 		String fileName = dataInputStream.readUTF();
-
+		System.out.println("lee el nombre del archivo");
         FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+		System.out.println("2");
         
 		//AES decryption
 		// BigInteger temp = BigInteger.valueOf(key);
@@ -88,14 +89,53 @@ public class Server {
 		// SecretKeySpec keySpec = new SecretKeySpec(byteKey, "AES");
 		// Cipher cipher = Cipher.getInstance("AES");
 		// cipher.init(Cipher.DECRYPT_MODE, keySpec);
-		// byte[] encryptedFile = cipher.doFinal(fileInputStream.read());
+		// byte[] encryptedFile = cipher.doFinal(fileInputStream.read());s
 
         long size = dataInputStream.readLong();     // read file size
-        byte[] buffer = new byte[4*1024];
+        System.out.println("lee el tamaño del archivo");
+		byte[] buffer = new byte[4*1024];
         while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
+			System.out.println("entra al for");
             fileOutputStream.write(buffer,0,bytes);
             size -= bytes;      // read upto file size
         }
+
+		System.out.println("desencripta");
+		
+		//the created file is loaded, decrypted and saved
+		File file = new File(fileName);
+		FileInputStream fileInputStream = new FileInputStream(file);
+		byte[] fileData = new byte[(int)file.length()];
+		System.out.println((int)file.length());
+        fileInputStream.read(fileData);
+
+		byte[] byteKey = hexToBytes("01010101010101010101010101010101");
+		
+		SecretKeySpec keySpec = new SecretKeySpec(byteKey, "AES");
+		Cipher cipher = Cipher.getInstance("AES");
+		cipher.init(Cipher.DECRYPT_MODE, keySpec);
+		byte[] encryptedFile = cipher.doFinal(fileData);
+		fileOutputStream = new FileOutputStream(fileName);
+		fileOutputStream.write(encryptedFile);
+
+
         fileOutputStream.close();
     }
+
+	public static byte[] hexToBytes(String str) {
+		if (str==null) {
+		   return null;
+		} else if (str.length() < 2) {
+		   return null;
+		} else {
+		   int len = str.length() / 2;
+		   byte[] buffer = new byte[len];
+		   for (int i=0; i<len; i++) {
+			   buffer[i] = (byte) Integer.parseInt(
+				  str.substring(i*2,i*2+2),16);
+		   }
+		   return buffer;
+		}
+  
+	 }
 }
