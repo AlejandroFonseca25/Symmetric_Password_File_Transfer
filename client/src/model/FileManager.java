@@ -4,8 +4,20 @@ import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import java.io.IOException;
+/**
 
+ * This entity is mainly used for displaying a file chooser dialog and select the desired file to transfer.
+
+ */
 public class FileManager{
+
+    /**
+	* Opens Java file explorer for selection of the to-be-encrypted file
+	* <p>
+	* After file selection, the method retrieves its' path and file name,
+    * and returns it in a String array for later use
+	* @return   A String array containing the path and name of the selected file
+	*/
 	public String[] chooseFile() throws IOException{
         String [] array = new String[2];
 
@@ -18,7 +30,6 @@ public class FileManager{
             array[1] = chooser.getSelectedFile().getName();
             return array;
         }
-
         return null;
 	}
     
