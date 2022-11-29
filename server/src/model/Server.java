@@ -1,11 +1,13 @@
 package model;
 
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.util.Scanner;
 import java.io.*;
 import java.math.BigInteger;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
 public class Server {
 	private static DataOutputStream dataOutputStream = null;
@@ -110,8 +112,9 @@ public class Server {
         fileInputStream.read(fileData);
 
 		byte[] byteKey = hexToBytes("01010101010101010101010101010101");
+		byte[] testKey = longToBytes(key);
 		
-		SecretKeySpec keySpec = new SecretKeySpec(byteKey, "AES");
+		SecretKeySpec keySpec = new SecretKeySpec(testKey, "AES");
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.DECRYPT_MODE, keySpec);
 		byte[] encryptedFile = cipher.doFinal(fileData);
@@ -138,4 +141,10 @@ public class Server {
 		}
   
 	 }
+	 public static byte[] longToBytes(long x) {
+		ByteBuffer buffer = ByteBuffer.allocate(16);
+		buffer.putLong(x);
+		System.out.println(buffer.array().toString());
+		return buffer.array();
+	}
 }

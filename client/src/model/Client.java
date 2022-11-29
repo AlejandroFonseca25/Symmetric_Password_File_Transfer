@@ -3,10 +3,12 @@ package model;
 import java.io.*;
 import java.math.BigInteger;
 import java.net.*;
+import java.nio.ByteBuffer;
 import java.util.Scanner;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 
 public class Client {
 	private static DataOutputStream dataOutputStream = null;
@@ -96,8 +98,9 @@ public class Client {
 		// AES encryption
 		// BigInteger temp = BigInteger.valueOf(key);
 		byte[] byteKey = hexToBytes("01010101010101010101010101010101");
+		byte[] testKey = longToBytes(key);
 		
-		SecretKeySpec keySpec = new SecretKeySpec(byteKey, "AES");
+		SecretKeySpec keySpec = new SecretKeySpec(testKey, "AES");
 		Cipher cipher = Cipher.getInstance("AES");
 		cipher.init(Cipher.ENCRYPT_MODE, keySpec);
 		byte[] encryptedFile = cipher.doFinal(fileData);
@@ -152,5 +155,12 @@ public class Client {
 		   return buffer;
 		}
   
-	 }
+	}
+
+	public static byte[] longToBytes(long x) {
+		ByteBuffer buffer = ByteBuffer.allocate(16);
+		buffer.putLong(x);
+		System.out.println(buffer.array().toString());
+		return buffer.array();
+	}
 }
